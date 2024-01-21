@@ -1,0 +1,73 @@
+.wrapper {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 1rem;
+}
+
+.filters {
+  min-height: 100vh;
+  background-color: var(--background-clr);
+  color: var(--primary-clr);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.filters > div > h1 {
+  margin-block: 0.75rem;
+  letter-spacing: 2px;
+  padding-left: 0.5rem;
+}
+
+.accordian {
+  cursor: pointer;
+}
+
+.accordian > div {
+  padding-inline: 0.5rem;
+  padding-block: 0.5rem;
+  background-color: var(--background-hover-clr);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.accordian > ul {
+  max-height: 20vh;
+  overflow-y: auto;
+  margin: 0;
+  padding: .5rem 0 .5rem .5rem;
+  font-size: .8rem;
+}
+
+.accordian > ul::-webkit-scrollbar {
+  width: .5rem;
+}
+
+.accordian > ul::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.accordian > ul::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background-color: var(--background-hover-clr);
+  outline: var(--accent-clr);
+}
+
+.toggleIcon {
+  transition: all .2s ease;
+}
+
+.toggleIcon[data-open="true"] {
+  transform: rotate(180deg);
+}
+
+.filterItem {
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+}
+
+.filterItem > input[type="checkbox"] {
+  accent-color: var(--accent-clr);
+}
