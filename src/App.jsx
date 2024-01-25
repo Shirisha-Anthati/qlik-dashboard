@@ -1,8 +1,10 @@
+import { Route, Routes } from "react-router-dom";
 import DashboardPage from "./pages/Dashboard.jsx";
 
 const App = () => {
-    console.log("re-rendered App.jsx")
-  return <DashboardPage />;
+    return <Routes>
+        <Route path="/" element={<DashboardPage />} />
+    </Routes>
 };
 
 export default App;
