@@ -33,28 +33,32 @@ const reducer = (state, action) => {
         ...state,
         utilityData: action.data,
       };
+    case 'update_filter_data':
+      return {
+        ...state,
+        filters: {
+          ...state.filters,
+          ...action.data,
+        },
+      };
     default:
       console.log(action.type);
       throw new Error('action type not permitted');
   }
 };
 
-const reduceFilterData = (data) => {
-  return data.reduce(
-    (init, curr) => {
-      for (const key of Object.keys(curr)) {
-        if (!init[key].includes(curr[key])) {
-          init[key] = [...init[key], curr[key]];
-        }
+const reduceFilterData = (data, initialData = { ...initialState.filters }) => {
+  return data.reduce((init, curr) => {
+    for (const key of Object.keys(curr)) {
+      if (init[key] && !init[key].includes(curr[key])) {
+        init[key] = [...init[key], curr[key]];
       }
-      return init;
-    },
-    { ...initialState.filters },
-  );
+    }
+    return init;
+  }, initialData);
 };
 
 const DashboardPage = () => {
-  console.log('re-rendered dashboard');
   const [state, dispatch] = useReducer(reducer, initialState);
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -69,15 +73,27 @@ const DashboardPage = () => {
   }, []);
 
   const searchWithFilters = useCallback(async () => {
-    console.log(searchParams.get('f'));
+    const param = searchParams.get('f');
     const res = await fetch(
-      `http://localhost:8080/api/utility/search?f=${encodeURIComponent(searchParams.get('f'))}`,
+      `http://localhost:8080/api/utility/search?f=${encodeURIComponent(param)}`,
     );
     if (!res.ok) {
       return null;
     }
     const data = await res.json();
-    console.log(data);
+    if (param) {
+      const filterParams = param.split('::');
+      const lastFilter = filterParams[filterParams.length - 1];
+      const remainingKeys = Object.keys(initialState.filters)
+        .filter((f) => !lastFilter.includes(f))
+        .reduce((init, curr) => (init = { ...init, [curr]: [] }), {});
+      dispatch({
+        type: 'update_filter_data',
+        data: reduceFilterData(data, remainingKeys),
+      });
+    } else {
+      dispatch({ type: 'update_filter_data', data: reduceFilterData(data) });
+    }
     dispatch({ type: 'set_utility_data', data });
   }, [searchParams]);
 
@@ -90,7 +106,6 @@ const DashboardPage = () => {
   }, [searchParams]);
 
   const handleCheckboxChange = (filterKey, e) => {
-    console.log(filterKey, e.target.checked, e.target.id);
     setSearchParams((prevParams) => {
       let f = prevParams.get('f');
       if (!f) {
